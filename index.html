@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pusat Bantuan - Formulir Pengajuan</title>
+    <!-- Menggunakan Tailwind CSS untuk styling modern -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Menggunakan font Inter dari Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Menerapkan font Inter ke seluruh halaman */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Styling tambahan untuk input radio kustom */
+        .peer:checked~.peer-checked\:bg-blue-600 {
+            background-color: #2563eb; /* blue-600 */
+        }
+        .peer:checked~.peer-checked\:text-white {
+            color: white;
+        }
+        .peer:checked~.peer-checked\:border-blue-600 {
+            border-color: #2563eb; /* blue-600 */
+        }
+    </style>
+</head>
+<body class="bg-slate-100 flex items-center justify-center min-h-screen p-4 sm:p-6 lg:p-8">
+
+    <div class="w-full max-w-xl bg-white rounded-2xl shadow-xl p-8 transition-all duration-300">
+        <!-- Header Formulir -->
+        <div class="text-center border-b border-slate-200 pb-6 mb-8">
+            <h1 class="text-3xl sm:text-4xl font-bold text-slate-800">Pusat Bantuan Pelanggan</h1>
+            <p class="mt-2 text-slate-500">Formulir Pengajuan Refill & Komplain</p>
+        </div>
+
+        <!-- Area Pesan Respons (Awalnya tersembunyi) -->
+        <div id="responseMessage" class="hidden p-4 mb-6 rounded-lg text-center font-medium transition-all duration-300"></div>
+
+        <!-- Formulir Fungsional -->
+        <form id="supportForm" action="https://api.web3forms.com/submit" method="POST">
+            <!-- Access Key Anda sudah dimasukkan di sini -->
+            <input type="hidden" name="access_key" value="57a09c42-6ac6-4182-8008-cddbf49130d0">
+            <!-- Mengarahkan pengguna ke halaman sukses custom (opsional) -->
+            <!-- <input type="hidden" name="redirect" value="https://yoursite.com/success.html"> -->
+            <!-- Subjek Email yang akan diterima -->
+            <input type="hidden" name="subject" value="Pengajuan Baru dari Formulir Bantuan">
+
+            <div class="space-y-6">
+                <!-- 1. Input Username / Link Postingan -->
+                <div>
+                    <label for="user_link" class="block text-sm font-semibold text-slate-700 mb-2">Username / Link Postingan</label>
+                    <input type="text" id="user_link" name="username_or_link" placeholder="Contoh: @towijaya atau link postingan" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition" required>
+                </div>
+
+                <!-- 2. Pilihan Jenis Permintaan -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-3">Jenis Permintaan</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <input type="radio" name="request_type" id="refill" value="Refill" class="peer hidden" required>
+                            <label for="refill" class="block cursor-pointer select-none rounded-lg border-2 border-slate-300 p-4 text-center transition-all duration-200 peer-checked:border-blue-600 peer-checked:bg-blue-600 peer-checked:text-white">
+                                <span class="font-bold">Isi Ulang (Refill)</span>
+                            </label>
+                        </div>
+                        <div>
+                            <input type="radio" name="request_type" id="complain" value="Komplain" class="peer hidden">
+                            <label for="complain" class="block cursor-pointer select-none rounded-lg border-2 border-slate-300 p-4 text-center transition-all duration-200 peer-checked:border-blue-600 peer-checked:bg-blue-600 peer-checked:text-white">
+                                <span class="font-bold">Keluhan (Complain)</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Input Detail Masalah atau Pesan -->
+                <div>
+                    <label for="details" class="block text-sm font-semibold text-slate-700 mb-2">Detail Masalah atau Pesan</label>
+                    <textarea id="details" name="details" rows="5" placeholder="Jelaskan masalah Anda atau tinggalkan pesan di sini..." class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition" required></textarea>
+                </div>
+            </div>
+
+            <!-- Tombol Kirim -->
+            <div class="mt-8">
+                <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3.5 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-300 shadow-lg hover:shadow-blue-500/50">
+                    Kirim Pengajuan
+                </button>
+            </div>
+        </form>
+
+        <!-- Footer -->
+        <div class="text-center mt-8">
+            <p class="text-xs text-slate-400">&copy; 2025 Nama Bisnis Anda. Semua hak dilindungi.</p>
+        </div>
+    </div>
+
+    <script>
+        // Kode JavaScript ini sekarang menangani pengiriman formulir secara asynchronous
+        const form = document.getElementById('supportForm');
+        const responseMessage = document.getElementById('responseMessage');
+        const submitButton = form.querySelector('button[type="submit"]');
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault(); // Mencegah reload halaman
+            
+            // Validasi sederhana (opsional, karena Web3Forms juga punya validasi)
+            let isValid = true;
+            form.querySelectorAll('[required]').forEach(field => {
+                if (field.type === 'radio') {
+                    if (!form.querySelector(`input[name="${field.name}"]:checked`)) isValid = false;
+                } else if (!field.value.trim()) {
+                    isValid = false;
+                }
+            });
+
+            if(!isValid) {
+                responseMessage.innerHTML = 'Harap lengkapi semua kolom yang wajib diisi.';
+                responseMessage.className = 'p-4 mb-6 rounded-lg text-center font-medium bg-red-100 text-red-800';
+                responseMessage.classList.remove('hidden');
+                return;
+            }
+
+            const formData = new FormData(form);
+            const object = {};
+            formData.forEach((value, key) => {
+                object[key] = value;
+            });
+            const json = JSON.stringify(object);
+
+            responseMessage.innerHTML = 'Pengajuan Anda sedang diproses...';
+            responseMessage.className = 'p-4 mb-6 rounded-lg text-center font-medium bg-yellow-100 text-yellow-800';
+            responseMessage.classList.remove('hidden');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Mengirim...';
+
+            fetch('https://api.web3forms.com/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: json
+            })
+            .then(async (response) => {
+                let jsonResponse = await response.json();
+                if (response.status == 200) {
+                    responseMessage.innerHTML = jsonResponse.message || 'Terima kasih! Pengajuan Anda telah berhasil dikirim.';
+                    responseMessage.className = 'p-4 mb-6 rounded-lg text-center font-medium bg-green-100 text-green-800';
+                } else {
+                    console.log(response);
+                    responseMessage.innerHTML = jsonResponse.message || 'Maaf, terjadi kesalahan saat mengirim pengajuan.';
+                    responseMessage.className = 'p-4 mb-6 rounded-lg text-center font-medium bg-red-100 text-red-800';
+                }
+            })
+            .catch(error => {
+                console.log(error);
+                responseMessage.innerHTML = 'Maaf, terjadi kesalahan koneksi.';
+                responseMessage.className = 'p-4 mb-6 rounded-lg text-center font-medium bg-red-100 text-red-800';
+            })
+            .then(() => {
+                form.reset(); // Mengosongkan formulir
+                submitButton.disabled = false; // Mengaktifkan kembali tombol
+                submitButton.textContent = 'Kirim Pengajuan';
+                setTimeout(() => {
+                    responseMessage.classList.add('hidden');
+                }, 4000); // Sembunyikan pesan setelah 4 detik
+            });
+        });
+    </script>
+
+</body>
+</html>
